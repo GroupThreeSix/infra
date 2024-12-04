@@ -37,7 +37,7 @@ jobs:
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
         with:
-          directory: .
+          directory: ./infra
           framework: terraform
           output_format: cli,sarif
           output_file: results.sarif
@@ -56,7 +56,7 @@ jobs:
             -backend-config="resource_group_name=${{ env.TF_VAR_backend_resource_group_name }}" \
             -backend-config="storage_account_name=${{ env.TF_VAR_backend_storage_account_name }}" \
             -backend-config="container_name=${{ env.TF_VAR_backend_container_name }}" \
-            -backend-conwfig="key=${{ env.TF_VAR_azure_environment || 'dev' }}.${{ env.TF_VAR_backend_key_name }}.tfstate"
+            -backend-config="key=${{ env.TF_VAR_azure_environment || 'dev' }}.${{ env.TF_VAR_backend_key_name }}.tfstate"
 
       - name: Terraform Format
         id: format
