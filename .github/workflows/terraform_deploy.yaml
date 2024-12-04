@@ -19,6 +19,9 @@ jobs:
   apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
