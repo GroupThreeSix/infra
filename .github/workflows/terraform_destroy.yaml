@@ -22,7 +22,9 @@ jobs:
   destroy:
     runs-on: ubuntu-latest
     if: github.event.inputs.confirm_destroy == 'DESTROY'
-
+    defaults:
+      run:
+        working-directory: ./infra
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
