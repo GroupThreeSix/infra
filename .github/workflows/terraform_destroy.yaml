@@ -66,4 +66,4 @@ jobs:
         retention-days: 1
 
     - name: Terraform Destroy
-      run: terraform apply "destroy.tfplan"
+      run: terraform apply tfplan
