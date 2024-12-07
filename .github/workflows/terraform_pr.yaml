@@ -1,7 +1,7 @@
-name: Cluster Manager Finish Provisioning
+name: Cluster Manager Init Provisioning
 
 on:
-  push:
+  pull_request:
     branches:
       - master
 
@@ -74,19 +74,15 @@ jobs:
         id: plan
         run: terraform plan -lock=false -out=tfplan
 
-      - name: Get timestamp
-        id: get-timestamp
-        run: |
-          echo "TIMESTAMP_PLAN=$(date +'%d-%m-%Y-%H')" >> $GITHUB_ENV
+      - name: Terraform config output
+        id: config-output
+        run: | 
+          terraform show -no-color tfplan > pr-tfplan.text
+          terraform show -json tfplan > pr-tfplan.json
 
-      - name: Upload plan artifact
-        uses: actions/upload-artifact@v4
+      - name: Notify plan
+        uses: ahmadnassri/action-terraform-report@v4
         with:
-          name: tfplan_${{ env.TIMESTAMP_PLAN }}
-          path: ${{ github.workspace }}/infra/tfplan
-          retention-days: 1
-
-      - name: Terraform Apply
-        id: apply
-        run: |
-          terraform apply tfplan
+          terraform-text: ${{ github.workspace }}/infra/pr-tfplan.text
+          terraform-json: ${{ github.workspace }}/infra/pr-tfplan.json
+          remove-stale-reports: true
