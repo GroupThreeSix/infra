@@ -27,6 +27,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
     load_balancer_sku   = var.cluster_network_type_load_balancer_sku
   }
 
+  service_mesh_profile {
+    mode = "Istio"
+    revisions = [
+      "asm-1-23" 
+    ]
+    external_ingress_gateway_enabled = true
+    internal_ingress_gateway_enabled = true
+  }
+
   private_cluster_enabled = false
   tags                    = var.tags_resource_environment
 
