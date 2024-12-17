@@ -7,6 +7,7 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
     "image-automation-controller.enabled" = true,
     "image-reflector-controller.enabled"  = true,
     "notification-controller.enabled"     = true,
+    "useKubeletIdentity"                  = true,
   }
 
   depends_on = [azurerm_kubernetes_cluster_node_pool.app_node_pool]
