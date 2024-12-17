@@ -128,3 +128,13 @@ variable "tags_resource_environment" {
     project     = "platform-engineering"
   }
 }
+
+variable "github_user" {
+  type        = string
+  description = "The GitHub username"
+}
+
+variable "github_token" {
+  type        = string
+  description = "The GitHub token"
+}

@@ -3,71 +3,43 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
   cluster_id     = azurerm_kubernetes_cluster.aks.id
   extension_type = "microsoft.flux"
 
+  configuration_settings = {
+    "image-automation-controller.enabled" = true,
+    "image-reflector-controller.enabled"  = true,
+    "notification-controller.enabled"     = true,
+  }
+
   depends_on = [azurerm_kubernetes_cluster_node_pool.app_node_pool]
 }
 
-# resource "azurerm_kubernetes_flux_configuration" "flux_config" {
-#   depends_on = [
-#     azurerm_kubernetes_cluster_extension.flux
-#   ]
+resource "azurerm_kubernetes_flux_configuration" "flux_config" {
+  depends_on = [
+    azurerm_kubernetes_cluster_extension.flux
+  ]
 
-#   name       = "aks-flux-extension"
-#   cluster_id = azurerm_kubernetes_cluster.k8s.id
-#   namespace  = "flux-system"
-#   scope      = "cluster"
+  name       = "aks-flux-extension"
+  cluster_id = azurerm_kubernetes_cluster.aks.id
+  namespace  = "flux-system"
+  scope      = "cluster"
+  continuous_reconciliation_enabled = true
 
-#   git_repository {
-#     url                      = local.flux_repository
-#     reference_type           = "branch"
-#     reference_value          = local.flux_branch
-#     timeout_in_seconds       = 600
-#     sync_interval_in_seconds = 30
-#   }
+  git_repository {
+    url                      = "https://github.com/GroupThreeSix/fluxcd-manifest"
+    reference_type           = "branch"
+    reference_value          = "master"
+    timeout_in_seconds       = 600
+    sync_interval_in_seconds = 30
+    https_user = var.github_user
+    https_key_base64 = base64encode(var.github_token)
+  }
 
-#   kustomizations {
-#     name                       = "istio-crd"
-#     path                       = local.crd_path
-#     timeout_in_seconds         = 600
-#     sync_interval_in_seconds   = 120
-#     retry_interval_in_seconds  = 300
-#     garbage_collection_enabled = true
-#     depends_on                 = []
-#   }
+  kustomizations {
+    name = "apps-staging"
+    path = "apps/staging"
 
-#   kustomizations {
-#     name                       = "istio-cfg"
-#     path                       = local.istio_cfg_path
-#     timeout_in_seconds         = 600
-#     sync_interval_in_seconds   = 120
-#     retry_interval_in_seconds  = 300
-#     garbage_collection_enabled = true
-#     depends_on = [
-#       "istio-crd"
-#     ]
-#   }
-
-#   kustomizations {
-#     name                       = "istio-gw"
-#     path                       = local.istio_gw_path
-#     timeout_in_seconds         = 600
-#     sync_interval_in_seconds   = 120
-#     retry_interval_in_seconds  = 300
-#     garbage_collection_enabled = true
-#     depends_on = [
-#       "istio-cfg"
-#     ]
-#   }
-
-#   kustomizations {
-#     name = "apps"
-#     path = local.app_path
-
-#     timeout_in_seconds         = 600
-#     sync_interval_in_seconds   = 120
-#     retry_interval_in_seconds  = 300
-#     garbage_collection_enabled = true
-#     depends_on = [
-#       "istio-cfg"
-#     ]
-#   }
-# }
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 300
+    garbage_collection_enabled = true
+  }
+}
