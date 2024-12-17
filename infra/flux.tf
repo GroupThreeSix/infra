@@ -52,4 +52,14 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     retry_interval_in_seconds  = 300
     garbage_collection_enabled = true
   }
+
+  kustomizations {
+    name = "image-update"
+    path = "clusters/image-update"
+
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 300
+    garbage_collection_enabled = true
+  }
 }
