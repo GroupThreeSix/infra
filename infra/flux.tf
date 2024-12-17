@@ -35,18 +35,8 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
   }
 
   kustomizations {
-    name = "apps-staging"
-    path = "apps/staging"
-
-    timeout_in_seconds         = 600
-    sync_interval_in_seconds   = 30
-    retry_interval_in_seconds  = 300
-    garbage_collection_enabled = true
-  }
-
-  kustomizations {
-    name = "apps-production"
-    path = "apps/production"
+    name = "infra-controllers"
+    path = "infrastructure/controllers"
 
     timeout_in_seconds         = 600
     sync_interval_in_seconds   = 30
@@ -62,5 +52,31 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     sync_interval_in_seconds   = 30
     retry_interval_in_seconds  = 300
     garbage_collection_enabled = true
+  }
+
+  kustomizations {
+    name = "apps-staging"
+    path = "apps/staging"
+
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 300
+    garbage_collection_enabled = true
+    depends_on = [
+      "image-update"
+    ]
+  }
+
+  kustomizations {
+    name = "apps-production"
+    path = "apps/production"
+
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 300
+    garbage_collection_enabled = true
+    depends_on = [
+      "image-update"
+    ]
   }
 }
