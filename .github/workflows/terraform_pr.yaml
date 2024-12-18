@@ -16,6 +16,8 @@ env:
   TF_VAR_backend_storage_account_name: ${{ vars.TF_VAR_backend_storage_account_name }}
   TF_VAR_backend_container_name: ${{ vars.TF_VAR_backend_container_name }}
   TF_VAR_backend_key_name: ${{ vars.TF_VAR_backend_key_name }}
+  TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
+  TF_VAR_github_user: ${{ secrets.GH_USER }}
 
 jobs:
   apply:
