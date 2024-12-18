@@ -10,6 +10,10 @@ resource "azurerm_monitor_workspace" "k8s" {
   resource_group_name = azurerm_resource_group.k8s.name
   location            = var.location_monitoring
   public_network_access_enabled = true
+
+  depends_on = [
+    azurerm_resource_group.k8s
+  ]
 }
 
 resource "azurerm_dashboard_grafana" "k8s" {
@@ -71,6 +75,13 @@ resource "azurerm_monitor_data_collection_rule" "k8s_msprom" {
     streams      = ["Microsoft-PrometheusMetrics"]
     destinations = [azurerm_monitor_workspace.k8s.name]
   }
+
+  depends_on = [
+    azurerm_monitor_workspace.k8s,
+    azurerm_dashboard_grafana.k8s,
+    azurerm_role_assignment.k8s_amg_me,
+    azurerm_role_assignment.k8s_rg_amg
+  ]
 }
 
 resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
