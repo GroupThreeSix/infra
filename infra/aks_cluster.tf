@@ -36,6 +36,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     internal_ingress_gateway_enabled = true
   }
 
+  monitor_metrics {
+  }
+
   private_cluster_enabled = false
   tags                    = var.tags_resource_environment
 
