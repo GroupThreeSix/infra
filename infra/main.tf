@@ -5,6 +5,8 @@ resource "azurerm_resource_group" "k8s" {
 
 data "azurerm_client_config" "current" {}
 
+data "azurerm_subscription" "current" {}
+
 resource "azurerm_resource_provider_registration" "alert" {
   name = "Microsoft.AlertsManagement"
 }

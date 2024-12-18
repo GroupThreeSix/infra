@@ -18,10 +18,10 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     azurerm_kubernetes_cluster_extension.flux
   ]
 
-  name       = "aks-flux-extension"
-  cluster_id = azurerm_kubernetes_cluster.aks.id
-  namespace  = "flux-system"
-  scope      = "cluster"
+  name                              = "aks-flux-extension"
+  cluster_id                        = azurerm_kubernetes_cluster.aks.id
+  namespace                         = "flux-system"
+  scope                             = "cluster"
   continuous_reconciliation_enabled = true
 
   git_repository {
@@ -30,8 +30,8 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     reference_value          = "master"
     timeout_in_seconds       = 600
     sync_interval_in_seconds = 30
-    https_user = var.github_user
-    https_key_base64 = base64encode(var.github_token)
+    https_user               = var.github_user
+    https_key_base64         = base64encode(var.github_token)
   }
 
   kustomizations {
