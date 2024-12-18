@@ -41,3 +41,24 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   depends_on = [azurerm_subnet.aks_subnet]
 }
+
+
+
+########################################
+## If using a custom default_node_pool_vnet_subnet_id id the AKS service principal
+## will need access to interact with the subnet.  This means adding permissions for
+## the AKS service principal with contributor access to the subnets.
+##
+## When creating an internal load balancer it needs to be able to read then create the load balancer in these subnets:
+##  Warning  SyncLoadBalancerFailed  3s (x6 over 2m39s)  service-controller  Error syncing load balancer: failed to ensure load balancer: Retriable: false, RetryAfter: 0s, HTTPStatusCode: 403, RawError: {"error":{"code":"AuthorizationFailed","message":"The client '33e40745-8982-4a7c-a955-13d954023ced' with object id '33e40745-8982-4a7c-a955-13d954023ced' does not have authorization to perform action 'Microsoft.Network/virtualNetworks/subnets/read' over scope '/subscriptions/7b3b906c-8d7c-4ad2-9c2f-b22c195f610e/resourceGroups/RS-DEV-EASTUS2-AKS-01/providers/Microsoft.Network/virtualNetworks/VNET-DEV-EASTUS2-AKS-01/subnets/SNET-AKS-Private-1' or the scope is invalid. If access was recently granted, please refresh your credentials."}}
+##
+## Scope - the resource group
+## Service principal - The AKS' service principal
+########################################
+
+
+resource "azurerm_role_assignment" "cluster_service_principal" {
+  scope                = azurerm_resource_group.k8s.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+}
