@@ -363,7 +363,7 @@ resource "azurerm_role_assignment" "k8s_rg_amg" {
   ]
 }
 
-resource "azurerm_role_assignment" "k8s_rg_amg" {
+resource "azurerm_role_assignment" "k8s_rd_amg" {
   principal_id         = azurerm_dashboard_grafana.k8s.identity[0].principal_id
   role_definition_name = "Monitoring Reader"
   scope                = data.azurerm_subscription.current.id
