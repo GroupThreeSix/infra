@@ -58,7 +58,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
 
 resource "azurerm_role_assignment" "cluster_service_principal" {
-  scope                = azurerm_resource_group.k8s.id
-  role_definition_name = "Contributor"
+  scope                = azurerm_subnet.aks_subnet.id
+  role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
