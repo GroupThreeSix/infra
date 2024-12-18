@@ -96,7 +96,7 @@ variable "cluster_additional_nodepool_name" {
 variable "cluster_additional_nodepool_autoscaling_enabled" {
   description = "Flag to enable or disable autoscaling for the additional node pool."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "cluster_additional_nodepool_autoscaling_min_count" {
@@ -108,7 +108,7 @@ variable "cluster_additional_nodepool_autoscaling_min_count" {
 variable "cluster_additional_nodepool_autoscaling_max_count" {
   description = "Maximum number of nodes for the additional node pool when autoscaling is enabled."
   type        = number
-  default     = 4
+  default     = 1
 }
 
 variable "cluster_additional_nodepool_labels" {
