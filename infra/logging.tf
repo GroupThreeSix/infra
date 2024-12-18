@@ -16,56 +16,56 @@ resource "azurerm_monitor_workspace" "k8s" {
   ]
 }
 
-resource "azurerm_monitor_data_collection_endpoint" "k8s_msprom" {
-  name                = "MSProm-${var.location}-${var.k8s_name}"
-  resource_group_name = azurerm_resource_group.k8s.name
-  location            = var.location_monitoring
-  kind                = "Linux"
-}
+# resource "azurerm_monitor_data_collection_endpoint" "k8s_msprom" {
+#   name                = "MSProm-${var.location}-${var.k8s_name}"
+#   resource_group_name = azurerm_resource_group.k8s.name
+#   location            = var.location_monitoring
+#   kind                = "Linux"
+# }
 
 
-resource "azurerm_monitor_data_collection_rule" "k8s_msprom" {
-  name                        = "MSProm-${var.location}-${var.k8s_name}"
-  resource_group_name         = azurerm_resource_group.k8s.name
-  location                    = var.location_monitoring
-  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.k8s_msprom.id
-  kind                        = "Linux"
-  data_sources {
-    prometheus_forwarder {
-      name    = "PrometheusDataSource"
-      streams = ["Microsoft-PrometheusMetrics"]
-    }
-  }
+# resource "azurerm_monitor_data_collection_rule" "k8s_msprom" {
+#   name                        = "MSProm-${var.location}-${var.k8s_name}"
+#   resource_group_name         = azurerm_resource_group.k8s.name
+#   location                    = var.location_monitoring
+#   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.k8s_msprom.id
+#   kind                        = "Linux"
+#   data_sources {
+#     prometheus_forwarder {
+#       name    = "PrometheusDataSource"
+#       streams = ["Microsoft-PrometheusMetrics"]
+#     }
+#   }
 
-  destinations {
-    monitor_account {
-      monitor_account_id = azurerm_monitor_workspace.k8s.id
-      name               = azurerm_monitor_workspace.k8s.name
-    }
-  }
+#   destinations {
+#     monitor_account {
+#       monitor_account_id = azurerm_monitor_workspace.k8s.id
+#       name               = azurerm_monitor_workspace.k8s.name
+#     }
+#   }
 
-  data_flow {
-    streams      = ["Microsoft-PrometheusMetrics"]
-    destinations = [azurerm_monitor_workspace.k8s.name]
-  }
+#   data_flow {
+#     streams      = ["Microsoft-PrometheusMetrics"]
+#     destinations = [azurerm_monitor_workspace.k8s.name]
+#   }
 
-  depends_on = [time_sleep.wait_60_seconds]
-}
+#   depends_on = [time_sleep.wait_60_seconds]
+# }
 
-resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
-  name                    = "MSProm-${var.location}-${var.k8s_name}"
-  target_resource_id      = azurerm_kubernetes_cluster.aks.id
-  data_collection_rule_id = azurerm_monitor_data_collection_rule.k8s_msprom.id
+# resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
+#   name                    = "MSProm-${var.location}-${var.k8s_name}"
+#   target_resource_id      = azurerm_kubernetes_cluster.aks.id
+#   data_collection_rule_id = azurerm_monitor_data_collection_rule.k8s_msprom.id
 
-  lifecycle {
-    replace_triggered_by = [azurerm_monitor_data_collection_rule.k8s_msprom]
-  }
+#   lifecycle {
+#     replace_triggered_by = [azurerm_monitor_data_collection_rule.k8s_msprom]
+#   }
 
-  depends_on = [
-    azurerm_monitor_data_collection_rule.k8s_msprom,
-    azurerm_kubernetes_cluster.aks
-  ]
-}
+#   depends_on = [
+#     azurerm_monitor_data_collection_rule.k8s_msprom,
+#     azurerm_kubernetes_cluster.aks
+#   ]
+# }
 
 resource "azurerm_dashboard_grafana" "k8s" {
   name                              = "${var.k8s_name}-dg"
@@ -88,7 +88,7 @@ resource "azurerm_dashboard_grafana" "k8s" {
 resource "azurerm_role_assignment" "k8s_amg_me" {
   scope                = azurerm_dashboard_grafana.k8s.id
   role_definition_name = "Grafana Admin"
-  principal_id         = data.azurerm_client_config.current.object_id
+  principal_id         = "4c603abb-6833-4865-879e-7243c7a5c1cf"
 
   depends_on = [
     azurerm_dashboard_grafana.k8s
@@ -113,6 +113,11 @@ resource "azurerm_role_assignment" "k8s_rd_amg" {
   depends_on = [
     azurerm_dashboard_grafana.k8s
   ]
+}
+
+resource "time_sleep" "wait_60_seconds" {
+  create_duration = "60s"
+  depends_on      = [azurerm_log_analytics_workspace.k8s]
 }
 
 # resource "azurerm_monitor_alert_prometheus_rule_group" "node" {
@@ -362,9 +367,3 @@ resource "azurerm_role_assignment" "k8s_rd_amg" {
 #     azurerm_kubernetes_cluster.aks
 #   ]
 # }
-
-
-resource "time_sleep" "wait_60_seconds" {
-  create_duration = "60s"
-  depends_on      = [azurerm_log_analytics_workspace.k8s, azurerm_monitor_data_collection_endpoint.k8s_msprom]
-}
