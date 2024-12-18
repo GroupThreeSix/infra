@@ -17,16 +17,3 @@ resource "azurerm_subnet" "aks_subnet" {
 
   depends_on = [azurerm_virtual_network.vnet]
 }
-
-resource "azurerm_network_security_group" "aks_nsg" {
-  name                = "${var.k8s_name}-nsg"
-  location            = azurerm_resource_group.k8s.location
-  resource_group_name = azurerm_resource_group.k8s.name
-}
-
-resource "azurerm_subnet_network_security_group_association" "aks_subnet_nsg_association" {
-  subnet_id                 = azurerm_subnet.aks_subnet.id
-  network_security_group_id = azurerm_network_security_group.aks_nsg.id
-
-  depends_on = [azurerm_network_security_group.aks_nsg, azurerm_subnet.aks_subnet]
-}

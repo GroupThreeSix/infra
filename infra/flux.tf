@@ -50,7 +50,7 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
 
     timeout_in_seconds         = 600
     sync_interval_in_seconds   = 30
-    retry_interval_in_seconds  = 300
+    retry_interval_in_seconds  = 60
     garbage_collection_enabled = true
     depends_on = [
       "image-update"
