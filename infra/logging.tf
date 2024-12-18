@@ -1,10 +1,3 @@
-resource "azapi_resource" "prometheus" {
-  type      = "microsoft.monitor/accounts@2021-06-03-preview"
-  name      = "${var.k8s_name}-workspace-prometheus"
-  parent_id = azurerm_resource_group.k8s.id
-  location  = azurerm_resource_group.k8s.location
-}
-
 resource "azurerm_log_analytics_workspace" "k8s" {
   location            = var.location
   name                = "${var.k8s_name}-logs"
@@ -16,6 +9,7 @@ resource "azurerm_monitor_workspace" "k8s" {
   name                = "amon-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
   location            = var.location
+  public_network_access_enabled = true
 }
 
 resource "azurerm_dashboard_grafana" "k8s" {
