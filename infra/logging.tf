@@ -149,7 +149,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "node" {
 }
 
 resource "azurerm_monitor_alert_prometheus_rule_group" "k8s" {
-  name                = "KubernetesRecordingRulesRuleGroup-${azurerm_kubernetes_cluster.example.name}"
+  name                = "KubernetesRecordingRulesRuleGroup-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
   location            = var.location
   cluster_name        = azurerm_kubernetes_cluster.aks.name
