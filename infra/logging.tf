@@ -67,6 +67,58 @@ resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
   ]
 }
 
+resource "azurerm_dashboard_grafana" "k8s" {
+  name                              = "amg-${var.k8s_name}"
+  resource_group_name               = azurerm_resource_group.k8s.name
+  location                          = var.location_monitoring
+  grafana_major_version             = "10"
+  api_key_enabled                   = true
+  deterministic_outbound_ip_enabled = true
+  public_network_access_enabled     = true
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  azure_monitor_workspace_integrations {
+    resource_id = azurerm_monitor_workspace.k8s.id
+  }
+
+  depends_on = [
+    azurerm_monitor_workspace.k8s
+  ]
+}
+
+resource "azurerm_role_assignment" "k8s_amg_me" {
+  scope                = azurerm_dashboard_grafana.k8s.id
+  role_definition_name = "Grafana Admin"
+  principal_id         = data.azurerm_client_config.current.object_id
+
+  depends_on = [
+    azurerm_dashboard_grafana.k8s
+  ]
+}
+
+resource "azurerm_role_assignment" "k8s_rg_amg" {
+  principal_id         = azurerm_dashboard_grafana.k8s.identity[0].principal_id
+  role_definition_name = "Monitoring Data Reader"
+  scope                = azurerm_resource_group.k8s.id
+
+  depends_on = [
+    azurerm_dashboard_grafana.k8s
+  ]
+}
+
+resource "azurerm_role_assignment" "k8s_rd_amg" {
+  principal_id         = azurerm_dashboard_grafana.k8s.identity[0].principal_id
+  role_definition_name = "Monitoring Reader"
+  scope                = data.azurerm_subscription.current.id
+
+  depends_on = [
+    azurerm_dashboard_grafana.k8s
+  ]
+}
+
 # resource "azurerm_monitor_alert_prometheus_rule_group" "node" {
 #   name                = "NodeRecordingRulesRuleGroup-${var.k8s_name}"
 #   resource_group_name = azurerm_resource_group.k8s.name
@@ -319,56 +371,4 @@ resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
 resource "time_sleep" "wait_60_seconds" {
   create_duration = "60s"
   depends_on      = [azurerm_log_analytics_workspace.k8s, azurerm_monitor_data_collection_endpoint.k8s_msprom]
-}
-
-resource "azurerm_dashboard_grafana" "k8s" {
-  name                              = "amg-${var.k8s_name}"
-  resource_group_name               = azurerm_resource_group.k8s.name
-  location                          = var.location_monitoring
-  grafana_major_version             = "10"
-  api_key_enabled                   = true
-  deterministic_outbound_ip_enabled = true
-  public_network_access_enabled     = true
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  azure_monitor_workspace_integrations {
-    resource_id = azurerm_monitor_workspace.k8s.id
-  }
-
-  depends_on = [
-    azurerm_monitor_workspace.k8s
-  ]
-}
-
-resource "azurerm_role_assignment" "k8s_amg_me" {
-  scope                = azurerm_dashboard_grafana.k8s.id
-  role_definition_name = "Grafana Admin"
-  principal_id         = data.azurerm_client_config.current.object_id
-
-  depends_on = [
-    azurerm_dashboard_grafana.k8s
-  ]
-}
-
-resource "azurerm_role_assignment" "k8s_rg_amg" {
-  principal_id         = azurerm_dashboard_grafana.k8s.identity[0].principal_id
-  role_definition_name = "Monitoring Data Reader"
-  scope                = azurerm_resource_group.k8s.id
-
-  depends_on = [
-    azurerm_dashboard_grafana.k8s
-  ]
-}
-
-resource "azurerm_role_assignment" "k8s_rd_amg" {
-  principal_id         = azurerm_dashboard_grafana.k8s.identity[0].principal_id
-  role_definition_name = "Monitoring Reader"
-  scope                = data.azurerm_subscription.current.id
-
-  depends_on = [
-    azurerm_dashboard_grafana.k8s
-  ]
 }

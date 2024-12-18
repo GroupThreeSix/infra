@@ -58,7 +58,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
 
 resource "azurerm_role_assignment" "cluster_service_principal" {
-  scope                = azurerm_virtual_network.vnet.id
+  scope                = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${azurerm_resource_group.k8s.name}/providers/Microsoft.Network/virtualNetworks/${azurerm_virtual_network.vnet.name}"
   role_definition_name = "Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+}
+
+resource "azurerm_role_assignment" "cluster_service_principal" {
+  scope                = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${azurerm_resource_group.k8s.name}/providers/Microsoft.Network/virtualNetworks/${azurerm_virtual_network.vnet.name}"
+  role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
