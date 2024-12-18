@@ -4,6 +4,12 @@ variable "location" {
   default     = "koreacentral"
 }
 
+variable "location_monitoring" {
+  type        = string
+  description = "The Azure region where resources should be created"
+  default     = "southeastasia"
+}
+
 variable "acr_resource_group_name" {
   type = string
   default = "group36-acr"

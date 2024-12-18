@@ -1,5 +1,5 @@
 resource "azurerm_log_analytics_workspace" "k8s" {
-  location            = var.location
+  location            = var.location_monitoring
   name                = "${var.k8s_name}-logs"
   resource_group_name = azurerm_resource_group.k8s.name
   sku                 = "PerGB2018"
@@ -8,14 +8,14 @@ resource "azurerm_log_analytics_workspace" "k8s" {
 resource "azurerm_monitor_workspace" "k8s" {
   name                = "amon-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
-  location            = var.location
+  location            = var.location_monitoring
   public_network_access_enabled = true
 }
 
 resource "azurerm_dashboard_grafana" "k8s" {
   name                  = "amg-${var.k8s_name}"
   resource_group_name   = azurerm_resource_group.k8s.name
-  location              = var.location
+  location              = var.location_monitoring
   grafana_major_version = "10"
 
   identity {
@@ -42,7 +42,7 @@ resource "azurerm_role_assignment" "k8s_rg_amg" {
 resource "azurerm_monitor_data_collection_endpoint" "k8s_msprom" {
   name                = "MSProm-${var.location}-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
-  location            = var.location
+  location            = var.location_monitoring
   kind                = "Linux"
 }
 
@@ -50,7 +50,7 @@ resource "azurerm_monitor_data_collection_endpoint" "k8s_msprom" {
 resource "azurerm_monitor_data_collection_rule" "k8s_msprom" {
   name                        = "MSProm-${var.location}-${var.k8s_name}"
   resource_group_name         = azurerm_resource_group.k8s.name
-  location                    = var.location
+  location                    = var.location_monitoring
   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.k8s_msprom.id
 
   data_sources {
@@ -95,7 +95,7 @@ resource "azurerm_monitor_data_collection_rule_association" "k8s_dce_to_aks" {
 resource "azurerm_monitor_alert_prometheus_rule_group" "node" {
   name                = "NodeRecordingRulesRuleGroup-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
-  location            = var.location
+  location            = var.location_monitoring
   cluster_name        = azurerm_kubernetes_cluster.aks.name
   rule_group_enabled  = true
   interval            = "PT1M"
@@ -160,7 +160,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "node" {
 resource "azurerm_monitor_alert_prometheus_rule_group" "k8s" {
   name                = "KubernetesRecordingRulesRuleGroup-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
-  location            = var.location
+  location            = var.location_monitoring
   cluster_name        = azurerm_kubernetes_cluster.aks.name
   rule_group_enabled  = true
   interval            = "PT1M"
@@ -278,7 +278,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "k8s" {
 resource "azurerm_monitor_data_collection_rule" "msci" {
   name                = "MSCI-${var.location}-${var.k8s_name}"
   resource_group_name = azurerm_resource_group.k8s.name
-  location            = var.location
+  location            = var.location_monitoring
   kind                = "Linux"
 
   data_sources {
