@@ -1,7 +1,7 @@
 variable "location" {
   type        = string
   description = "The Azure region where resources should be created"
-  default     = "koreacentral"
+  default     = "southeastasia"
 }
 
 variable "location_monitoring" {
