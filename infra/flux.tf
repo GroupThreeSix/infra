@@ -71,6 +71,19 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
   }
 
   kustomizations {
+    name = "grafana"
+    path = "clusters/grafana"
+
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 60
+    garbage_collection_enabled = true
+    depends_on = [
+      "infra-controllers"
+    ]
+  }
+
+  kustomizations {
     name = "image-update"
     path = "clusters/image-update"
 
