@@ -76,12 +76,7 @@ resource "azurerm_monitor_data_collection_rule" "k8s_msprom" {
     destinations = [azurerm_monitor_workspace.k8s.name]
   }
 
-  depends_on = [
-    azurerm_monitor_workspace.k8s,
-    azurerm_dashboard_grafana.k8s,
-    azurerm_role_assignment.k8s_amg_me,
-    azurerm_role_assignment.k8s_rg_amg
-  ]
+  depends_on = [time_sleep.wait_60_seconds]
 }
 
 resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
@@ -330,4 +325,10 @@ resource "azurerm_monitor_data_collection_rule_association" "msci_to_aks" {
   lifecycle {
     replace_triggered_by = [azurerm_monitor_data_collection_rule.msci]
   }
+}
+
+
+resource "time_sleep" "wait_60_seconds" {
+  create_duration = "60s"
+  depends_on      = [azurerm_log_analytics_workspace.k8s]
 }
