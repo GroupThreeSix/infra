@@ -68,7 +68,7 @@ resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
 }
 
 resource "azurerm_dashboard_grafana" "k8s" {
-  name                              = "amg-${var.k8s_name}"
+  name                              = "${var.k8s_name}-dg"
   resource_group_name               = azurerm_resource_group.k8s.name
   location                          = var.location_monitoring
   grafana_major_version             = "10"
@@ -83,10 +83,6 @@ resource "azurerm_dashboard_grafana" "k8s" {
   azure_monitor_workspace_integrations {
     resource_id = azurerm_monitor_workspace.k8s.id
   }
-
-  depends_on = [
-    azurerm_monitor_workspace.k8s
-  ]
 }
 
 resource "azurerm_role_assignment" "k8s_amg_me" {
