@@ -88,7 +88,7 @@ variable "cluster_nodepool_autoscaling_max_count" {
 }
 
 variable "agents_size" {
-  default     = "Standard_B2s_v2"
+  default     = "standard_b2as_v2"
   description = "The default virtual machine size for the Kubernetes agents"
   type        = string
 }
