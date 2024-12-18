@@ -53,7 +53,20 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     retry_interval_in_seconds  = 60
     garbage_collection_enabled = true
     depends_on = [
-      "image-update"
+      "infra-controllers"
+    ]
+  }
+
+  kustomizations {
+    name = "infra-config-staging"
+    path = "clusters/staging/infrastructure"
+
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 60
+    garbage_collection_enabled = true
+    depends_on = [
+      "infra-controllers"
     ]
   }
 
