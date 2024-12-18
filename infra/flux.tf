@@ -45,6 +45,19 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
   }
 
   kustomizations {
+    name = "infra-config-production"
+    path = "clusters/production/infrastructure"
+
+    timeout_in_seconds         = 600
+    sync_interval_in_seconds   = 30
+    retry_interval_in_seconds  = 300
+    garbage_collection_enabled = true
+    depends_on = [
+      "image-update"
+    ]
+  }
+
+  kustomizations {
     name = "image-update"
     path = "clusters/image-update"
 
@@ -62,9 +75,6 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     sync_interval_in_seconds   = 30
     retry_interval_in_seconds  = 300
     garbage_collection_enabled = true
-    depends_on = [
-      "image-update"
-    ]
   }
 
   kustomizations {
@@ -75,8 +85,5 @@ resource "azurerm_kubernetes_flux_configuration" "flux_config" {
     sync_interval_in_seconds   = 30
     retry_interval_in_seconds  = 300
     garbage_collection_enabled = true
-    depends_on = [
-      "image-update"
-    ]
   }
 }
