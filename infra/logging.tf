@@ -1,3 +1,10 @@
+resource "azapi_resource" "prometheus" {
+  type      = "microsoft.monitor/accounts@2021-06-03-preview"
+  name      = "${var.k8s_name}-workspace-prometheus"
+  parent_id = azurerm_resource_group.k8s.id
+  location  = azurerm_resource_group.k8s.location
+}
+
 resource "azurerm_log_analytics_workspace" "k8s" {
   location            = var.location
   name                = "${var.k8s_name}-logs"
@@ -76,11 +83,19 @@ resource "azurerm_monitor_data_collection_rule_association" "k8s_dcr_to_aks" {
   name                    = "dcr-${var.k8s_name}"
   target_resource_id      = azurerm_kubernetes_cluster.aks.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.k8s_msprom.id
+
+  lifecycle {
+    replace_triggered_by = [azurerm_monitor_data_collection_rule.k8s_msprom]
+  }
 }
 
 resource "azurerm_monitor_data_collection_rule_association" "k8s_dce_to_aks" {
   target_resource_id          = azurerm_kubernetes_cluster.aks.id
   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.k8s_msprom.id
+
+  lifecycle {
+    replace_triggered_by = [azurerm_monitor_data_collection_rule.k8s_msprom]
+  }
 }
 
 resource "azurerm_monitor_alert_prometheus_rule_group" "node" {
@@ -306,4 +321,8 @@ resource "azurerm_monitor_data_collection_rule_association" "msci_to_aks" {
   name                    = "msci-${var.k8s_name}"
   target_resource_id      = azurerm_kubernetes_cluster.aks.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.msci.id
+
+  lifecycle {
+    replace_triggered_by = [azurerm_monitor_data_collection_rule.msci]
+  }
 }

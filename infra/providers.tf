@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.3.2"
     }
+    azapi = {
+      source = "azure/azapi"
+      version = "2.1.0"
+    }
   }
 
   backend "azurerm" {
