@@ -73,7 +73,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -refresh-only -out=tfplan
+        run: terraform plan -out=tfplan
 
       - name: Get timestamp
         id: get-timestamp
